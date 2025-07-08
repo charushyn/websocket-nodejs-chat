@@ -1,0 +1,7 @@
+ROUTES (/users):
+
+1. POST (create) /
+2. READ (get) /:userId
+3. READ (get all) /
+3. PATCH with body (username: string), (username has to be unique) /:userId/username
+4. DELETE (only user can delete himself) /:userId
