@@ -5,7 +5,7 @@ const sendOkResponse = async (
   status: number,
   payload: object | null
 ) => {
-  return res.status(status).end(JSON.stringify(payload));
+  return res.status(status).json(payload);
 };
 
 export { sendOkResponse };

@@ -1,12 +1,10 @@
-// import { Types } from "mongoose";
-// import { UserRole } from "../../entities/user/model";
+import { Types } from "mongoose";
 
-// declare global {
-//   namespace Express {
-//     interface User {
-//       id: Types.ObjectId;
-//       email: string;
-//       roles: UserRole[];
-//     }
-//   }
-// }
+declare global {
+  namespace Express {
+    interface User {
+      id: Types.ObjectId;
+      email: string;
+    }
+  }
+}

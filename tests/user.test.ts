@@ -1,28 +1,40 @@
+import "dotenv/config";
+
 import request from "supertest";
 import app from "../src/app";
-import { UserType } from "../src/entities/user/model";
+import mongoose from "mongoose";
+// import { UserType } from "../src/entities/user/model";
 
-describe("/messages", () => {
+beforeAll(async () => {
+  await mongoose.connect(process.env.DB_URL || "");
+});
+
+afterAll(async () => {
+  await mongoose.connection.close();
+});
+
+describe("/users", () => {
   let createdUserId: string;
+  let headerAuthValue: string;
 
   it("POST should create a user", async () => {
-    const user: UserType = {
+    const user = {
       email: "test@gmail.com",
       username: "test",
-      chats: [],
-      token: "token:test",
+      password: "password",
     };
 
-    const { body } = await request(app).post("/users").send(user).expect(201);
+    const { body, header } = await request(app)
+      .post("/users")
+      .send(user)
+      .expect(201);
 
-    expect(body).toMatchObject({
-      email: user.email,
-      username: user.username,
-      chats: user.chats,
-      token: user.token,
-    });
+    expect(body.email).toEqual(user.email);
+    expect(body.username).toEqual(user.username);
+    expect(header["authorization"]).toMatch(/Bearer /);
 
     createdUserId = body._id;
+    headerAuthValue = header["authorization"];
   });
 
   it("GET should return array with created users", async () => {
@@ -40,16 +52,23 @@ describe("/messages", () => {
   it("PATCH should update user's username", async () => {
     const newUsername = { username: "updated username!" };
     const { body } = await request(app)
-      .patch(`/users/${createdUserId}`)
+      .patch(`/users/${createdUserId}/username`)
+      .set("Authorization", headerAuthValue)
       .send(newUsername)
       .expect(200);
 
     expect(body._id).toEqual(createdUserId);
-    expect(body.username).toEqual(newUsername);
+    expect(body.username).toEqual(newUsername.username);
   });
 
   it("DELETE should remove user", async () => {
-    await request(app).delete(`/users/${createdUserId}`).expect(204);
-    await request(app).get(`/users/${createdUserId}`).expect(404);
+    await request(app)
+      .delete(`/users/${createdUserId}`)
+      .set("Authorization", headerAuthValue)
+      .expect(204);
+    await request(app)
+      .get(`/users/${createdUserId}`)
+      .set("Authorization", headerAuthValue)
+      .expect(404);
   });
 });

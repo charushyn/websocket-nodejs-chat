@@ -1,6 +1,0 @@
-ROUTES (/messages):
-
-1. POST /
-2. GET /
-3. PATCH with body (text: string) (only user who wrote this text can update text) /:messageId
-4. DELETE (only user who wrote this message can delete) /:messageId
